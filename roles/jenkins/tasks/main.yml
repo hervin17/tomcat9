@@ -1,0 +1,24 @@
+---
+# tasks file for jenkins
+
+- name: deploiement de jenkins
+  get_url:
+     url: http://mirrors.jenkins.io/war-stable/latest/jenkins.war
+     dest: /opt/apache-tomcat-9.0.37/webapps
+     remote_src: yes
+  tags: deploiement 
+
+- name: definir dossier pour  la variable jenkins_home 
+  file: 
+    path: /var/lib/jenkins
+    state: directory
+    mode: '0777'
+  tags: maj
+
+- name: ajout de la variable d'env au /conf/context de tomcat
+  blockinfile:
+    path: /opt/apache-tomcat-9.0.37/conf/context.xml
+    insertbefore: "</Context>"
+    block:
+      <Environment name="JENKINS_HOME" value="/var/lib/jenkins" type="java.lang.String" />
+  tags: maj 

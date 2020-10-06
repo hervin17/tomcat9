@@ -1,0 +1,13 @@
+---
+# tasks file for java
+
+ - name: update 
+   yum:
+     name: epel-release
+     state: latest
+
+
+ - name: installation de java-jdk8
+   yum:
+     name: "{{ java_packages }}"
+     state: present 

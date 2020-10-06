@@ -1,0 +1,51 @@
+version: '3.3'
+
+services:
+  apache1:
+    container_name: apache1
+    image: myhttpd:latest
+    ports:
+       - "8080:80"
+       - "443:443"
+  apache2:
+    container_name: apache2
+    image: myhttpd:latest
+    ports:
+       - "8081:80"
+       - "444:443"
+  php1:
+    container_name: php1
+    image: php-mysql:fpm
+    links:
+      - "apache1"
+      - "mysql1"
+     
+  php2:
+    container_name: php2
+    image: llaumgui/php:7.2-fpm
+    #ou php:7.4-fpm-alpine
+    links:
+      - "apache2"
+      - "mysql2"
+
+  mysql1:
+    container_name: mysql
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+      MYSQL_DATABASE: test
+    ports:
+      - "3306:3306"
+
+  mysql2:
+    container_name: mysql2
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+      MYSQL_DATABASE: test
+    ports:
+      - "3307:3306"

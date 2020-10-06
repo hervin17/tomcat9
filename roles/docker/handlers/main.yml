@@ -1,0 +1,7 @@
+---
+# handlers file for docker
+
+- name: deploiement app
+  command:
+    sudo /home/vagrant/web/docker-compose up -d
+

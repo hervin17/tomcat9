@@ -1,0 +1,63 @@
+---
+# tasks file for docker
+#
+
+- name: ajout du repo docker
+  command: sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+- name: installation de docker
+  yum: name={{ item }} state=present
+  with_items:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+
+
+- name: demarrer docker
+  service: name=docker state=started
+ 
+- name: installation de docker-compose
+  command: 
+    sudo curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+- name: rendre executable docker-compose
+  file:
+    path: /usr/local/bin/docker-compose
+    mode: u+x,g+x,o+x
+
+- name: creation du repertoire web  qui contiendra le docker-compose.yml
+  file:
+    path: /home/vagrant/web
+    state: directory
+    mode: '0777'
+
+- name: creation des volumes www pour apache
+  file:
+    path: /home/vagrant/web/www
+    state: directory
+    mode: '0777'
+
+- name: ajout du dockerfile et du docker-compose file
+  template:
+    src: '{{ item }}'
+    dest: /home/vagrant/web
+  with_items:
+    - docker-compose.yml
+    - Dockerfile
+
+- name: faire un build du dockerfile
+  command: sudo docker build -t myhttpd .
+
+- name: activer les virtualhosts
+    template:
+      src: httpd.conf
+      dest: /home/vagrant/web/
+      mode: '0777'
+
+- name: declaration du vhost dans le httpd-vhost.conf
+  template:
+    src: httpd-vhosts.conf
+    dest: /home/vagrant/web
+    mode: '0777'
+  notify: deploiement app
+

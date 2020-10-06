@@ -1,0 +1,61 @@
+---
+# tasks file for tomcat9
+
+
+- name: create d'un user tomcat9
+  user:
+    name: tomcat9
+    group: root
+
+- name: telechargement du fichier tar.gz  de tomcat9
+  get_url:
+    url: https://downloads.apache.org/tomcat/tomcat-9/v9.0.37/bin/apache-tomcat-9.0.37.tar.gz
+    dest: /opt
+    remote_src: yes
+
+- name: decompression du tar
+  unarchive:
+    src: /opt/apache-tomcat-9.0.37.tar.gz
+    dest: /opt/
+    remote_src: yes
+
+- name: creation d'un fichier systemd de tomcat9
+  template:
+    src: tomcat.service
+    dest: /etc/systemd/system
+    owner: root
+    group: root
+    mode: 777
+
+- name: autoriser l'access au fichier de config de tomcat9
+  shell: sudo chmod  777 -R  /opt/apache-tomcat-9.0.37/
+
+
+- name: acces manager depuis une ip qcq
+  template:
+    src: m_context.xml
+    dest: /opt/apache-tomcat-9.0.37/webapps/manager/META-INF/context.xml
+
+- name: access host-manager 
+  template:
+    src: hm_context.xml
+    dest: /opt/apache-tomcat-9.0.37/webapps/host-manager/META-INF/context.xml
+
+#essayer avec l'user tomcat9
+- name: creation de l'user manager
+  template:
+    src: tomcat-users.xml
+    dest: /opt/apache-tomcat-9.0.37/conf/tomcat-users.xml
+    owner: root
+    group: root
+
+
+- name: demarrer tomcat
+  service: name=tomcat state=started
+
+
+ # modifier le fichier context en ajoutant valve et revoir privilege
+ # peut etre que certains roles de tomcat 8 n'exitse pa sur tomcat9
+ # pour accedder a l'interface web 
+ # il faut commenter le contenu de la balise </context pour host-manager et manager
+ # puis definir les users dans le tomcat-user.xml

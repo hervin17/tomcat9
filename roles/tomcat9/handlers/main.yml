@@ -1,0 +1,9 @@
+---
+# handlers file for tomcat9
+
+
+- name: redemarrer tomcat9
+  service: name=tomcat state=restarted
+
+- name: daemon-reload
+  service: name=daemon-reload state=update
