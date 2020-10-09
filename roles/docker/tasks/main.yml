@@ -49,10 +49,10 @@
   command: sudo docker build -t myhttpd .
 
 - name: activer les virtualhosts
-    template:
-      src: httpd.conf
-      dest: /home/vagrant/web/
-      mode: '0777'
+  template:
+    src: httpd.conf
+    dest: /home/vagrant/web/
+    mode: '0777'
 
 - name: declaration du vhost dans le httpd-vhost.conf
   template:
